@@ -25,11 +25,11 @@ def create_user(
         password=password,
         **extra_fields
     )
-    return user  # type: ignore
+    return user
 
 
 def get_user(user_id: int) -> User:
-    return UserModel.get(id=user_id)  # type: ignore
+    return UserModel.get(id=user_id)
 
 
 def update_user(
@@ -40,7 +40,7 @@ def update_user(
         first_name: str | None = None,
         last_name: str | None = None
 ) -> User:
-    user: User = UserModel.get(id=user_id)  # type: ignore
+    user = get_user(user_id)
 
     if username:
         user.username = username

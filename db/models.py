@@ -12,7 +12,7 @@ class Genre(models.Model):
     name = models.CharField(max_length=255, unique=True)
 
     def __str__(self) -> str:
-        return self.name
+        return f"<Genre: {self.name}>"
 
 
 class Actor(models.Model):
@@ -20,7 +20,7 @@ class Actor(models.Model):
     last_name = models.CharField(max_length=255)
 
     def __str__(self) -> str:
-        return f"{self.first_name} {self.last_name}"
+        return f"<Actor: {self.first_name} {self.last_name}>"
 
 
 class Movie(models.Model):
@@ -30,7 +30,7 @@ class Movie(models.Model):
     genres = models.ManyToManyField(to=Genre, related_name="movies")
 
     def __str__(self) -> str:
-        return self.title
+        return f"<Movie: {self.title}>"
 
 
 class CinemaHall(models.Model):
@@ -43,7 +43,7 @@ class CinemaHall(models.Model):
         return self.rows * self.seats_in_row
 
     def __str__(self) -> str:
-        return self.name
+        return f"<CinemaHall: {self.name}>"
 
 
 class MovieSession(models.Model):
@@ -56,27 +56,36 @@ class MovieSession(models.Model):
     )
 
     def __str__(self) -> str:
-        return (f"{self.movie.title} "
-                f"{self.show_time.strftime('%Y-%m-%d %H:%M:%S')}")
+        return (f"<MovieSession: {self.movie.title} - "
+                f"{self.show_time.strftime('%Y-%m-%d %H:%M:%S')}>")
 
 
 class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="orders"
+    )
 
     class Meta:
         ordering = ["-created_at"]
 
     def __str__(self) -> str:
-        return f"{self.created_at.strftime('%Y-%m-%d %H:%M:%S')}"
+        return f"<Order: {self.created_at.strftime('%Y-%m-%d %H:%M:%S')}>"
 
 
 class Ticket(models.Model):
     movie_session = models.ForeignKey(
-        MovieSession, on_delete=models.CASCADE, related_name="tickets")
+        MovieSession,
+        on_delete=models.CASCADE,
+        related_name="tickets"
+    )
     order = models.ForeignKey(
-        Order, on_delete=models.CASCADE, related_name="tickets")
+        Order,
+        on_delete=models.CASCADE,
+        related_name="tickets"
+    )
     row = models.IntegerField()
     seat = models.IntegerField()
 
@@ -111,7 +120,7 @@ class Ticket(models.Model):
 
     def __str__(self) -> str:
         return (
-            f"{self.movie_session.movie.title} "
+            f"<Ticket: {self.movie_session.movie.title} "
             f"{self.movie_session.show_time.strftime('%Y-%m-%d %H:%M:%S')} "
-            f"(row: {self.row}, seat: {self.seat})"
+            f"(row: {self.row}, seat: {self.seat})>"
         )

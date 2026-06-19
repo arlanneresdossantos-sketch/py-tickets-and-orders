@@ -12,7 +12,7 @@ class Genre(models.Model):
     name = models.CharField(max_length=255, unique=True)
 
     def __str__(self) -> str:
-        return f"<Genre: {self.name}>"
+        return self.name
 
 
 class Actor(models.Model):
@@ -20,7 +20,7 @@ class Actor(models.Model):
     last_name = models.CharField(max_length=255)
 
     def __str__(self) -> str:
-        return f"<Actor: {self.first_name} {self.last_name}>"
+        return f"{self.first_name} {self.last_name}"
 
 
 class Movie(models.Model):
@@ -30,7 +30,7 @@ class Movie(models.Model):
     genres = models.ManyToManyField(to=Genre, related_name="movies")
 
     def __str__(self) -> str:
-        return f"<Movie: {self.title}>"
+        return self.title
 
 
 class CinemaHall(models.Model):
@@ -43,7 +43,7 @@ class CinemaHall(models.Model):
         return self.rows * self.seats_in_row
 
     def __str__(self) -> str:
-        return f"<CinemaHall: {self.name}>"
+        return self.name
 
 
 class MovieSession(models.Model):
@@ -56,8 +56,7 @@ class MovieSession(models.Model):
     )
 
     def __str__(self) -> str:
-        return (f"<MovieSession: {self.movie.title} - "
-                f"{self.show_time.strftime('%Y-%m-%d %H:%M:%S')}>")
+        return f"{self.movie.title} {self.show_time.strftime('%Y-%m-%d %H:%M:%S')}"
 
 
 class Order(models.Model):
@@ -70,22 +69,13 @@ class Order(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
-
     def __str__(self) -> str:
-        return f"<Order: {self.created_at.strftime('%Y-%m-%d %H:%M:%S')}>"
+        return str(self.created_at)
 
 
 class Ticket(models.Model):
-    movie_session = models.ForeignKey(
-        MovieSession,
-        on_delete=models.CASCADE,
-        related_name="tickets"
-    )
-    order = models.ForeignKey(
-        Order,
-        on_delete=models.CASCADE,
-        related_name="tickets"
-    )
+    movie_session = models.ForeignKey(MovieSession, on_delete=models.CASCADE, related_name="tickets")
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="tickets")
     row = models.IntegerField()
     seat = models.IntegerField()
 
@@ -102,16 +92,12 @@ class Ticket(models.Model):
 
         if not (1 <= self.row <= hall.rows):
             raise ValidationError({
-                "row": [
-                    f"row number must be in available "
-                    f"range: (1, rows): (1, {hall.rows})"]
+                "row": [f"row number must be in available range: (1, rows): (1, {hall.rows})"]
             })
 
         if not (1 <= self.seat <= hall.seats_in_row):
             raise ValidationError({
-                "seat": [
-                    f"seat number must be in available "
-                    f"range: (1, seats_in_row): (1, {hall.seats_in_row})"]
+                "seat": [f"seat number must be in available range: (1, seats_in_row): (1, {hall.seats_in_row})"]
             })
 
     def save(self, *args, **kwargs) -> None:
@@ -120,7 +106,7 @@ class Ticket(models.Model):
 
     def __str__(self) -> str:
         return (
-            f"<Ticket: {self.movie_session.movie.title} "
+            f"{self.movie_session.movie.title} "
             f"{self.movie_session.show_time.strftime('%Y-%m-%d %H:%M:%S')} "
-            f"(row: {self.row}, seat: {self.seat})>"
+            f"(row: {self.row}, seat: {self.seat})"
         )

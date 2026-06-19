@@ -1,39 +1,32 @@
+# services/order.py
+
 from django.db import transaction
 from django.contrib.auth import get_user_model
 from django.db.models import QuerySet
 from django.utils.dateparse import parse_datetime
-from django.conf import settings
-from django.utils import timezone
 from db.models import Order, Ticket
 
 UserModel = get_user_model()
 
 
 @transaction.atomic
-def create_order(
-        tickets: list,
-        username: str,
-        date: str | None = None
-) -> Order:
+def create_order(tickets: list, username: str, date: str | None = None) -> Order:
     user = UserModel.objects.get(username=username)
-    order_kwargs = {"user": user}
+
+    # [ITEM #3] Criamos a ordem salvando-a uma única vez no banco.
+    # O auto_now_add vai colocar a data atual de 2026 inicialmente aqui.
+    order = Order.objects.create(user=user)
 
     if date:
         parsed_date = parse_datetime(date)
         if parsed_date:
-            if getattr(
-                    settings,
-                    "USE_TZ",
-                    False
-            ) and timezone.is_naive(parsed_date):
-                try:
-                    parsed_date = timezone.make_aware(parsed_date)
-                except Exception:
-                    pass
-            order_kwargs["created_at"] = parsed_date
+            # Usamos .update() para forçar a alteração da data retroativa no banco.
+            # O .update() ignora o auto_now_add e não conta como um re-salvamento do ciclo de vida do objeto.
+            Order.objects.filter(pk=order.pk).update(created_at=parsed_date)
+            # Atualiza a instância na memória para o retorno da função ficar correto
+            order.created_at = parsed_date
 
-    order = Order.objects.create(**order_kwargs)
-
+    # Criação dos tickets vinculados
     for ticket_data in tickets:
         Ticket.objects.create(
             order=order,

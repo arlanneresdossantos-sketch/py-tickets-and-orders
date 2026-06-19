@@ -1,8 +1,10 @@
+from typing import cast
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import UserManager
 from db.models import User
 
-UserModel: UserManager = get_user_model().objects
+
+UserModel = cast(UserManager, get_user_model().objects)
 
 
 def create_user(
@@ -25,11 +27,11 @@ def create_user(
         password=password,
         **extra_fields
     )
-    return user
+    return user  # type: ignore
 
 
 def get_user(user_id: int) -> User:
-    return UserModel.get(id=user_id)
+    return UserModel.get(id=user_id)  # type: ignore
 
 
 def update_user(

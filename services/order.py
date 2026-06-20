@@ -23,8 +23,7 @@ def create_order(
 
     with transaction.atomic():
         if date:
-            parsed_date = datetime.datetime.strptime(
-                date, "%Y-%m-%d %H:%M")
+            parsed_date = datetime.datetime.strptime(date, "%Y-%m-%d %H:%M")
             order = Order.objects.create(user=user)
             Order.objects.filter(pk=order.pk).update(created_at=parsed_date)
             order.refresh_from_db()

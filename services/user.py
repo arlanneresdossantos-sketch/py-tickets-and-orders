@@ -18,11 +18,7 @@ def create_user(
     if last_name:
         extra_fields["last_name"] = last_name
 
-    return User.objects.create_user(
-        username=username,
-        password=password,
-        **extra_fields
-    )
+    return User.objects.create_user(username=username, password=password, **extra_fields)
 
 
 def get_user(user_id: int) -> User:

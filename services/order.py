@@ -14,7 +14,11 @@ def get_orders(username: str | None = None) -> QuerySet:
     return queryset
 
 
-def create_order(tickets: list[dict], username: str, date: str | None = None) -> Order:
+def create_order(
+        tickets: list[dict],
+        username: str,
+        date: str | None = None
+) -> Order:
     user = User.objects.get(username=username)
 
     with transaction.atomic():

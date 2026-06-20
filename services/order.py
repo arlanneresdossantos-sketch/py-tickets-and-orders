@@ -2,6 +2,7 @@ import datetime
 from django.db import transaction
 from django.contrib.auth import get_user_model
 from django.db.models import QuerySet
+from django.shortcuts import get_object_or_404
 from db.models import Order, Ticket
 
 User = get_user_model()
@@ -19,7 +20,7 @@ def create_order(
         username: str,
         date: str | None = None
 ) -> Order:
-    user = User.objects.get(username=username)
+    user = get_object_or_404(User, username=username)
 
     with transaction.atomic():
         if date:

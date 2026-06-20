@@ -7,7 +7,7 @@ def get_movies(
     genres_ids: list[int] | None = None,
     actors_ids: list[int] | None = None,
     title: str | None = None,
-) -> QuerySet:
+) -> QuerySet[Movie]:
     queryset = Movie.objects.all()
 
     if title:
@@ -26,20 +26,20 @@ def get_movie_by_id(movie_id: int) -> Movie:
     return Movie.objects.get(id=movie_id)
 
 
+@transaction.atomic
 def create_movie(
     movie_title: str,
     movie_description: str,
     genres_ids: list | None = None,
     actors_ids: list | None = None,
 ) -> Movie:
-    with transaction.atomic():
-        movie = Movie.objects.create(
-            title=movie_title,
-            description=movie_description,
-        )
-        if genres_ids:
-            movie.genres.set([int(g_id) for g_id in genres_ids])
-        if actors_ids:
-            movie.actors.set([int(a_id) for a_id in actors_ids])
+    movie = Movie.objects.create(
+        title=movie_title,
+        description=movie_description,
+    )
+    if genres_ids:
+        movie.genres.set([int(g_id) for g_id in genres_ids])
+    if actors_ids:
+        movie.actors.set([int(a_id) for a_id in actors_ids])
 
-        return movie
+    return movie

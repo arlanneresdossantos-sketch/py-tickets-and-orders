@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 
 User = get_user_model()
 
@@ -18,15 +19,11 @@ def create_user(
     if last_name:
         extra_fields["last_name"] = last_name
 
-    return User.objects.create_user(
-        username=username,
-        password=password,
-        **extra_fields
-    )
+    return User.objects.create_user(username=username, password=password, **extra_fields)
 
 
 def get_user(user_id: int) -> User:
-    return User.objects.get(id=user_id)
+    return get_object_or_404(User, id=user_id)
 
 
 def update_user(
@@ -37,7 +34,7 @@ def update_user(
         first_name: str | None = None,
         last_name: str | None = None
 ) -> User:
-    user = User.objects.get(id=user_id)
+    user = get_object_or_404(User, id=user_id)
 
     if username is not None:
         user.username = username

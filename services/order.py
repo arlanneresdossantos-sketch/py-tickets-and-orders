@@ -14,14 +14,19 @@ def get_orders(username: str | None = None) -> QuerySet:
     return queryset
 
 
-def create_order(tickets: list[dict], username: str, date: str | None = None) -> Order:
+def create_order(
+        tickets: list[dict],
+        username: str,
+        date: str | None = None
+) -> Order:
     user = User.objects.get(username=username)
 
     with transaction.atomic():
         order = Order.objects.create(user=user)
 
         if date:
-            order.created_at = datetime.datetime.strptime(date, "%Y-%m-%d %H:%M")
+            order.created_at = datetime.datetime.strptime(
+                date, "%Y-%m-%d %H:%M")
             order.save()
 
         for ticket_data in tickets:

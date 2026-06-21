@@ -23,13 +23,19 @@ def create_order(
 ) -> Order:
     user = get_object_or_404(User, username=username)
 
-    if date:
-        parsed_date = datetime.datetime.strptime(date, "%Y-%m-%d %H:%M")
-        order = Order.objects.create(user=user)
-        Order.objects.filter(pk=order.pk).update(created_at=parsed_date)
-        order.refresh_from_db()
-    else:
-        order = Order.objects.create(user=user)
+    field = Order._meta.get_field("created_at")
+
+    auto_now_add_original = getattr(field, "auto_now_add", False)
+
+    try:
+        if date:
+            parsed_date = datetime.datetime.strptime(date, "%Y-%m-%d %H:%M")
+            setattr(field, "auto_now_add", False)
+            order = Order.objects.create(user=user, created_at=parsed_date)
+        else:
+            order = Order.objects.create(user=user)
+    finally:
+        setattr(field, "auto_now_add", auto_now_add_original)
 
     for ticket_data in tickets:
         Ticket.objects.create(

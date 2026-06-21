@@ -38,7 +38,7 @@ def update_user(
         first_name: str | None = None,
         last_name: str | None = None
 ) -> User:
-    user = get_object_or_404(User, id=user_id)
+    user = get_user(user_id)
 
     if username is not None:
         user.username = username
